@@ -1,0 +1,185 @@
+/* @settings
+name: Inline TOC
+id: inline-toc
+settings:
+  -
+    id: inline-toc-indent
+    title: Indent per level
+    type: variable-number
+    default: 16
+    format: px
+*/
+
+.inline-toc {
+  --inline-toc-indent: var(--size-4-4);
+  --inline-toc-gap: var(--size-2-1);
+  --inline-toc-bg: var(--background-secondary);
+  --inline-toc-border: var(--background-modifier-border);
+  --inline-toc-radius: var(--radius-m);
+  --inline-toc-link: var(--link-color);
+  --inline-toc-link-hover: var(--link-color-hover);
+  --inline-toc-active: var(--text-accent);
+  --inline-toc-number: var(--text-muted);
+  --inline-toc-font-size: var(--font-text-size);
+  font-size: var(--inline-toc-font-size);
+  margin-block: var(--size-4-2);
+}
+
+.inline-toc.is-framed {
+  padding: var(--size-4-2) var(--size-4-3);
+  border: 1px solid var(--inline-toc-border);
+  border-radius: var(--inline-toc-radius);
+  background-color: var(--inline-toc-bg);
+}
+
+.inline-toc.is-hidden {
+  display: none;
+}
+
+.inline-toc-header {
+  display: flex;
+  align-items: center;
+  gap: var(--inline-toc-gap);
+  font-weight: var(--font-semibold);
+}
+
+.inline-toc-toggle,
+.inline-toc-fold {
+  flex: none;
+  padding: 0;
+  width: var(--size-4-5);
+  height: var(--size-4-5);
+  background: transparent;
+  box-shadow: none;
+  color: var(--text-muted);
+}
+
+.inline-toc-toggle .svg-icon,
+.inline-toc-fold .svg-icon {
+  width: var(--icon-s);
+  height: var(--icon-s);
+}
+
+.inline-toc-fold .svg-icon {
+  transition: transform 100ms ease-out;
+}
+
+.inline-toc-item.is-folded > .inline-toc-fold .svg-icon {
+  transform: rotate(-90deg);
+}
+
+.inline-toc-body {
+  margin-top: var(--inline-toc-gap);
+}
+
+.inline-toc-list {
+  margin: 0;
+  padding-inline-start: var(--inline-toc-indent);
+  list-style: none;
+}
+
+.inline-toc-body > .inline-toc-list {
+  padding-inline-start: var(--size-4-5);
+}
+
+.inline-toc-list.is-ordered {
+  list-style: decimal;
+}
+
+.inline-toc-item {
+  position: relative;
+  margin-block: var(--inline-toc-gap);
+}
+
+/* The bullet is drawn here so the fold button can take its place. */
+.inline-toc-list:not(.is-numbered):not(.is-ordered) > .inline-toc-item:not(.has-children)::before {
+  content: "\2022";
+  position: absolute;
+  inset-inline-start: calc(var(--size-4-4) * -1);
+  color: var(--text-faint);
+}
+
+.inline-toc-item > .inline-toc-fold {
+  position: absolute;
+  inset-inline-start: calc(var(--size-4-5) * -1 - 2px);
+  top: 0;
+}
+
+.inline-toc-list.is-ordered > .inline-toc-item > .inline-toc-fold {
+  inset-inline-start: calc(var(--size-4-8) * -1);
+}
+
+.inline-toc-link {
+  color: var(--inline-toc-link);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.inline-toc-link:hover {
+  color: var(--inline-toc-link-hover);
+  text-decoration: underline;
+}
+
+.inline-toc-link:focus-visible,
+.inline-toc-toggle:focus-visible,
+.inline-toc-fold:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: 1px;
+}
+
+.inline-toc-item.is-active > .inline-toc-link {
+  color: var(--inline-toc-active);
+  font-weight: var(--font-semibold);
+  border-inline-start: 2px solid var(--inline-toc-active);
+  padding-inline-start: var(--size-2-2);
+  margin-inline-start: calc(var(--size-2-2) * -1 - 2px);
+}
+
+.inline-toc-number {
+  color: var(--inline-toc-number);
+  font-variant-numeric: tabular-nums;
+}
+
+.inline-toc-inline .inline-toc-sep {
+  color: var(--text-faint);
+}
+
+.inline-toc-empty,
+.inline-toc-note {
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+  font-style: italic;
+}
+
+.is-mobile .inline-toc-link,
+.is-mobile .inline-toc-toggle,
+.is-mobile .inline-toc-fold {
+  min-height: 32px;
+}
+
+.is-mobile .inline-toc-link {
+  display: inline-flex;
+  align-items: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .inline-toc-fold .svg-icon {
+    transition: none;
+  }
+}
+
+@media print {
+  .inline-toc.is-framed {
+    background: none;
+  }
+
+  .inline-toc-toggle,
+  .inline-toc-fold {
+    display: none;
+  }
+
+  .inline-toc-list[hidden],
+  .inline-toc-body[hidden] {
+    display: block;
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "id": "inline-toc",
+  "name": "Inline TOC",
+  "version": "0.1.0",
+  "minAppVersion": "1.5.7",
+  "description": "A live, clickable table of contents in any note, or a plain Markdown one that keeps itself up to date and works in Publish. Foldable, with the current section highlighted.",
+  "author": "Siulved54",
+  "authorUrl": "https://github.com/perezamadorluisenrique-gif",
+  "isDesktopOnly": false
+}

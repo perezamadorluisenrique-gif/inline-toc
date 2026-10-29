@@ -41,3 +41,13 @@ test('adoptable: lists of heading links', () => {
   const insta = adoptable('```insta-toc\nmin: 2\nmax: 3\n```', 1)!;
   assert.deepEqual([insta.start, insta.end, insta.opts.min, insta.opts.max], [0, 3, 2, 3]);
 });
+
+test('a toc block with no closing fence is not a block yet', () => {
+  const t = '# A\n\n```toc\n\n## B\nimportant text\n## C\nmore';
+  assert.equal(blockAt(t, 3), null);
+  assert.equal(blockAt(t, 5), null);
+});
+
+test('adoptable does not throw on a lone percent sign', () => {
+  assert.doesNotThrow(() => adoptable('- [50%](#50%)', 0));
+});

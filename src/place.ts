@@ -21,8 +21,11 @@ export function blockAt(text: string, line: number): BlockAt | null {
     const m = LIVE_OPEN.exec(lines[i]);
     if (!m) continue;
     let end = i + 1;
-    while (end < lines.length && !new RegExp(`^\\s*${m[1][0] === '`' ? '`' : '~'}{${m[1].length},}\\s*$`).test(lines[end])) end++;
-    if (line >= i && line <= Math.min(end, lines.length - 1)) return { kind: 'live', start: i, end: Math.min(end, lines.length - 1) };
+    const close = new RegExp(`^\\s*${m[1][0] === '`' ? '`' : '~'}{${m[1].length},}\\s*$`);
+    while (end < lines.length && !close.test(lines[end])) end++;
+    // A block still being typed has no closing fence: it is not a block yet.
+    if (end >= lines.length) continue;
+    if (line >= i && line <= end) return { kind: 'live', start: i, end };
     i = end;
   }
   for (const b of findMarkedBlocks(text).blocks) {
@@ -68,6 +71,14 @@ export function placeBlock(text: string, cursorLine: number, block: string): Cha
   return { from: pos, to: pos, text: `${before ? '\n' : ''}${block}\n${after ? '\n' : ''}` };
 }
 
+const safeDecode = (v: string) => {
+  try {
+    return decodeURI(v);
+  } catch {
+    return v;
+  }
+};
+
 const LINK_ITEM =
   /^(\s*)(?:[-*+]|\d+[.)])\s+(?:\d+(?:\.\d+)*\.?\s+)?(?:\[\[#([^\]]*?)(?:\|[^\]]*)?\]\]|\[[^\]]*\]\(#([^)]*)\))\s*$/;
 
@@ -109,7 +120,7 @@ export function adoptable(text: string, line: number): Adoptable | null {
   const targets: string[] = [];
   for (let i = start; i <= end; i++) {
     const m = LINK_ITEM.exec(lines[i])!;
-    const raw = m[2] ?? decodeURI(m[3] ?? '');
+    const raw = m[2] ?? safeDecode(m[3] ?? '');
     targets.push(raw.split('#').pop() ?? raw);
   }
   const ordered = /^\s*\d+[.)]/.test(lines[start]);

@@ -46,6 +46,7 @@ class TocBlock extends MarkdownRenderChild implements HoverParent {
   private nav: HTMLElement;
   private sig = '';
   private again: number | null = null;
+  private retries = 0;
 
   constructor(
     private plugin: InlineTOCPlugin,
@@ -95,7 +96,7 @@ class TocBlock extends MarkdownRenderChild implements HoverParent {
     const result = layout(headings, opts, { stripNumbers: s.stripNumbers, blockLine: line });
     const allNotes = [...notes, ...result.notes];
     const sig = signature(result.items, opts) + JSON.stringify([allNotes, s.framed, line]);
-    if (opts.scope === 'section' && line === undefined && this.again === null) {
+    if (opts.scope === 'section' && line === undefined && this.again === null && this.retries++ < 5) {
       // The section position is only known once Obsidian has attached the block.
       this.again = window.setTimeout(() => {
         this.again = null;
@@ -313,6 +314,7 @@ export default class InlineTOCPlugin extends Plugin {
     this.registerDomEvent(activeDocument, 'scroll', (ev) => this.queueActive(ev.target as HTMLElement), { capture: true, passive: true });
     this.registerEvent(this.app.workspace.on('active-leaf-change', () => this.queueActive(null)));
 
+    this.register(() => this.autoRefreshNow.cancel());
     this.addCommands();
   }
 
@@ -410,19 +412,24 @@ export default class InlineTOCPlugin extends Plugin {
   }
 
   private autoRefreshNow = debounce(
-    (editor: Editor) => {
+    (editor: Editor, path: string) => {
       if (!this.settings.autoRefresh || this.lastWasHistory) return;
+      // The editor may have moved on to another note since the edit.
+      if (this.app.workspace.getActiveFile()?.path !== path) return;
       const text = editor.getValue();
       if (!text.includes('<!-- inline-toc')) return;
       const cm = (editor as unknown as { cm?: EditorView }).cm;
       if (cm?.composing) return;
       const sig = parseHeadings(text).map((h) => `${h.level}|${h.raw}`).join('\n');
-      const { changes, blocks } = refreshChanges(text, this.renderCtx());
-      const key = this.app.workspace.getActiveFile()?.path ?? '';
-      if (!changes.length || (this.lastSig.get(key) === sig && blocks === 0)) return;
+      if (this.lastSig.get(path) === sig) return;
+      const { changes } = refreshChanges(text, this.renderCtx());
+      this.lastSig.set(path, sig);
+      if (!changes.length) return;
       const cur = editor.getCursor();
-      if (findMarkedBlocks(text).blocks.some((b) => cur.line >= b.openLine && cur.line <= b.closeLine)) return;
-      this.lastSig.set(key, sig);
+      if (findMarkedBlocks(text).blocks.some((b) => cur.line >= b.openLine && cur.line <= b.closeLine)) {
+        this.lastSig.delete(path);
+        return;
+      }
       editor.transaction({ changes });
     },
     2000,
@@ -430,7 +437,8 @@ export default class InlineTOCPlugin extends Plugin {
   );
 
   private autoRefresh(editor: Editor) {
-    if (this.settings.autoRefresh) this.autoRefreshNow(editor);
+    const path = this.app.workspace.getActiveFile()?.path;
+    if (this.settings.autoRefresh && path) this.autoRefreshNow(editor, path);
   }
 
   private refreshMarkdown(editor: Editor): boolean {

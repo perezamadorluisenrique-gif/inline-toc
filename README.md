@@ -95,7 +95,7 @@ Title, lowest and highest heading level, style, number format, whether to leave 
 
 ## Coming from another table-of-contents plugin
 
-- **Automatic Table of Contents:** your blocks render as they are. Only one plugin can own the `toc` language, so disable it first; the settings tab tells you if another plugin has claimed it.
+- **Automatic Table of Contents:** your blocks render as they are. Only one plugin can render a code block language, so disable it first (if Automatic Table of Contents loads first it keeps `table-of-contents`, and the settings tab says so).
 - **Table of Contents:** run **Adopt existing table of contents** with the cursor in each list.
 - **Insta TOC:** the same command turns its block into a marked list.
 

@@ -78,3 +78,10 @@ test('blockBody mirrors the marker', () => {
   const opts = { ...BUILTIN, min: 2, style: 'inline' as const };
   assert.deepEqual(parseOptions(blockBody(opts)).opts, opts);
 });
+
+test('block bodies survive quotes in values', () => {
+  const opts = { ...BUILTIN, title: 'Say "hi" now', exclude: '/a"b/' };
+  const back = parseOptions(blockBody(opts)).opts;
+  assert.equal(back.title, 'Say "hi" now');
+  assert.equal(back.exclude, '/a"b/');
+});

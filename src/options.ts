@@ -250,13 +250,14 @@ export function markerLine(opts: TocOptions): string {
 /** The body of a live block that says the same as `opts`, writing the keys that differ from `base`. */
 export function blockBody(opts: TocOptions, base: TocOptions = BUILTIN): string {
   const lines: string[] = [];
+  const q = (v: string) => (v.includes('"') && !v.includes("'") ? `'${v}'` : `"${v}"`);
   if (opts.min !== base.min) lines.push(`min: ${opts.min}`);
   if (opts.max !== base.max) lines.push(`max: ${opts.max}`);
   if (opts.style !== base.style) lines.push(`style: ${opts.style}`);
   if (opts.format !== base.format) lines.push(`format: ${opts.format}`);
-  if (opts.title !== base.title) lines.push(`title: "${opts.title}"`);
-  if (opts.include !== base.include) lines.push(`include: "${opts.include}"`);
-  if (opts.exclude !== base.exclude) lines.push(`exclude: "${opts.exclude}"`);
+  if (opts.title !== base.title) lines.push(`title: ${q(opts.title)}`);
+  if (opts.include !== base.include) lines.push(`include: ${q(opts.include)}`);
+  if (opts.exclude !== base.exclude) lines.push(`exclude: ${q(opts.exclude)}`);
   if (opts.links !== base.links) lines.push(`links: ${opts.links}`);
   if (opts.scope !== base.scope) lines.push(`scope: ${opts.scope}`);
   if (opts.skipH1 !== base.skipH1) lines.push(`skipH1: ${opts.skipH1}`);

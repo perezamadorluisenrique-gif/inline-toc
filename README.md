@@ -147,6 +147,7 @@ In Obsidian, open **Settings → Community plugins → Browse** and search for "
 | [Emoji Search](https://obsidian.md/plugins?id=emoji-search) | Insert emojis from a searchable picker or by typing a :shortcode. | [emoji-search](https://github.com/perezamadorluisenrique-gif/emoji-search) |
 
 All of them are in the community directory: Settings -> Community plugins ->
-Browse, then search for the name.
+Browse, then search for the name. Demos and install links for every one:
+[the catalog](https://perezamadorluisenrique-gif.github.io/catalog/).
 
 Follow new plugins and updates on X: [@luenpereza](https://x.com/luenpereza)

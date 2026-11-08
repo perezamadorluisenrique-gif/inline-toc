@@ -33,6 +33,7 @@ import {
   toMarkdown,
 } from './src/logic.ts';
 import type { Heading, RenderContext, Settings, TocItem, TocOptions } from './src/logic.ts';
+import { moreDefinitions, renderMore } from './src/more-link.ts';
 
 const LANGUAGES = ['toc', 'table-of-contents'];
 
@@ -646,7 +647,7 @@ class InlineTOCSettingTab extends PluginSettingTab {
 
   getSettingDefinitions(): SettingDefinitionItem[] {
     const d = DEFAULT_SETTINGS as unknown as Record<string, unknown>;
-    return GROUPS.map((g) => ({
+    const groups = GROUPS.map((g) => ({
       type: 'group' as const,
       heading: g.heading,
       items: g.fields.map((f) => {
@@ -657,6 +658,7 @@ class InlineTOCSettingTab extends PluginSettingTab {
         return { ...base, control: { type: 'dropdown' as const, key: f.key, options: f.options, defaultValue: String(dv) } };
       }),
     }));
+    return [...groups, ...(moreDefinitions() as SettingDefinitionItem[])];
   }
 
   getControlValue(key: string): unknown {
@@ -703,5 +705,6 @@ class InlineTOCSettingTab extends PluginSettingTab {
         ? `Another plugin already renders ${blocked.join(' and ')} blocks. Disable it and reload to let Inline TOC render them.`
         : 'Inline TOC renders toc and table-of-contents code blocks.',
     });
+    renderMore(this.containerEl, (el) => new Setting(el));
   }
 }
